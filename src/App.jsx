@@ -189,6 +189,8 @@ const i18n = {
     title: '205-maktab',
     subtitle: 'Zamonaviy taʼlim, xalqaro sertifikatlar va ochiq maʼlumotlar maydoni.',
     contactBtn: 'Bogʻlanish',
+    controlsShow: "Ko'rsatish",
+    controlsHide: 'Yigʻish',
     themeBtnDark: 'Dark mode',
     themeBtnLight: 'Light mode',
     nav: {
@@ -235,6 +237,8 @@ const i18n = {
     updatesTitle: 'Eng soʻnggi yangiliklar',
     updatesText: 'Maktabdagi tadbirlar va eʼlonlar.',
     readMore: 'Batafsil',
+    contactModalTitle: "Bog'lanish ma'lumotlari",
+    contactModalText: "Quyida maktabning aloqa ma'lumotlari berilgan.",
     footerEmail: 'Email',
     footerAddress: 'Manzil',
     footerExtra: 'Qoʻshimcha maʼlumot',
@@ -251,6 +255,8 @@ const i18n = {
     title: 'School 205',
     subtitle: 'Modern education, international certificates, and transparent data space.',
     contactBtn: 'Contact',
+    controlsShow: 'Show',
+    controlsHide: 'Collapse',
     themeBtnDark: 'Dark mode',
     themeBtnLight: 'Light mode',
     nav: {
@@ -296,6 +302,8 @@ const i18n = {
     updatesTitle: 'Latest updates',
     updatesText: 'School events and announcements.',
     readMore: 'Read more',
+    contactModalTitle: 'Contact details',
+    contactModalText: 'School contact details are provided below.',
     footerEmail: 'Email',
     footerAddress: 'Address',
     footerExtra: 'Additional info',
@@ -312,6 +320,8 @@ const i18n = {
     title: 'Школа 205',
     subtitle: 'Современное образование, международные сертификаты и открытые данные.',
     contactBtn: 'Связаться',
+    controlsShow: 'Показать',
+    controlsHide: 'Свернуть',
     themeBtnDark: 'Темный режим',
     themeBtnLight: 'Светлый режим',
     nav: {
@@ -357,6 +367,8 @@ const i18n = {
     updatesTitle: 'Последние новости',
     updatesText: 'События и объявления школы.',
     readMore: 'Подробнее',
+    contactModalTitle: 'Контактные данные',
+    contactModalText: 'Ниже указаны контактные данные школы.',
     footerEmail: 'Email',
     footerAddress: 'Адрес',
     footerExtra: 'Дополнительно',
@@ -405,6 +417,9 @@ function App() {
   const [isCarouselPaused, setIsCarouselPaused] = useState(false)
   const [selectedImageIndex, setSelectedImageIndex] = useState(null)
   const [tableQuery, setTableQuery] = useState('')
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
+  const [isContactModalOpen, setIsContactModalOpen] = useState(false)
+  const [isHeaderToolsCollapsed, setIsHeaderToolsCollapsed] = useState(false)
 
   const t = i18n[language]
   const marqueeImages = useMemo(() => [...navImages, ...navImages], [])
@@ -500,6 +515,31 @@ function App() {
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [selectedImageIndex])
 
+  useEffect(() => {
+    if (!isContactModalOpen) return undefined
+
+    const onKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setIsContactModalOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown)
+    return () => window.removeEventListener('keydown', onKeyDown)
+  }, [isContactModalOpen])
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth > 768) {
+        setIsMobileNavOpen(false)
+        setIsHeaderToolsCollapsed(false)
+      }
+    }
+
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+
   const handleImageError = (index) => {
     setBrokenImages((prev) => {
       if (prev.has(index)) return prev
@@ -527,7 +567,11 @@ function App() {
             <h1 className="header__title">{t.title}</h1>
             <p className="header__subtitle">{t.subtitle}</p>
           </div>
-          <div className="header__actions">
+          <div
+            className={`header__actions ${
+              isHeaderToolsCollapsed ? 'header__actions--collapsed' : ''
+            }`}
+          >
             <a className="btn btn--primary" href="#aloqa">
               {t.contactBtn}
             </a>
@@ -539,41 +583,53 @@ function App() {
             >
               {theme === 'light' ? t.themeBtnDark : t.themeBtnLight}
             </button>
-            <div className="lang-switch" aria-label={t.langLabel}>
-              <button
-                type="button"
-                className={`lang-switch__btn ${language === 'uz' ? 'is-active' : ''}`}
-                onClick={() => setLanguage('uz')}
+            <label className="lang-switch">
+              <span className="lang-switch__label">{t.langLabel}</span>
+              <select
+                className="lang-switch__select"
+                value={language}
+                onChange={(event) => setLanguage(event.target.value)}
+                aria-label={t.langLabel}
               >
-                UZ
-              </button>
-              <button
-                type="button"
-                className={`lang-switch__btn ${language === 'en' ? 'is-active' : ''}`}
-                onClick={() => setLanguage('en')}
-              >
-                EN
-              </button>
-              <button
-                type="button"
-                className={`lang-switch__btn ${language === 'ru' ? 'is-active' : ''}`}
-                onClick={() => setLanguage('ru')}
-              >
-                RU
-              </button>
-            </div>
+                <option value="uz">UZ</option>
+                <option value="en">ENG</option>
+                <option value="ru">RUS</option>
+              </select>
+            </label>
           </div>
+          <button
+            type="button"
+            className="header__tools-toggle"
+            onClick={() => setIsHeaderToolsCollapsed((prev) => !prev)}
+            aria-expanded={!isHeaderToolsCollapsed}
+          >
+            {isHeaderToolsCollapsed ? `▾ ${t.controlsShow}` : `▴ ${t.controlsHide}`}
+          </button>
         </div>
       </header>
 
       <nav className="nav" aria-label="Primary sections navigation">
         <div className="container nav__inner">
-          <ul className="nav__list">
+          <button
+            type="button"
+            className="nav__menu-btn"
+            aria-expanded={isMobileNavOpen}
+            aria-controls="main-nav-list"
+            onClick={() => setIsMobileNavOpen((prev) => !prev)}
+          >
+            {isMobileNavOpen ? '✕' : '☰'}
+          </button>
+
+          <ul
+            id="main-nav-list"
+            className={`nav__list ${isMobileNavOpen ? 'nav__list--open' : ''}`}
+          >
             {navIds.map((id) => (
               <li key={id}>
                 <a
                   className={`nav__link ${activeNav === id ? 'nav__link--active' : ''}`}
                   href={`#${id}`}
+                  onClick={() => setIsMobileNavOpen(false)}
                 >
                   {t.nav[id]}
                 </a>
@@ -834,7 +890,11 @@ function App() {
                 <article key={item.id} className="update-card">
                   <time dateTime={item.date}>{item.date}</time>
                   <h3>{item.title}</h3>
-                  <button type="button" className="btn btn--ghost">
+                  <button
+                    type="button"
+                    className="btn btn--ghost"
+                    onClick={() => setIsContactModalOpen(true)}
+                  >
                     {t.readMore}
                   </button>
                 </article>
@@ -873,6 +933,43 @@ function App() {
         >
           {t.topBtn}
         </button>
+      ) : null}
+
+      {isContactModalOpen ? (
+        <div
+          className="contact-modal"
+          role="dialog"
+          aria-modal="true"
+          aria-label={t.contactModalTitle}
+          onClick={() => setIsContactModalOpen(false)}
+        >
+          <div className="contact-modal__content" onClick={(event) => event.stopPropagation()}>
+            <button
+              type="button"
+              className="contact-modal__close"
+              onClick={() => setIsContactModalOpen(false)}
+            >
+              {t.modalClose}
+            </button>
+            <h3>{t.contactModalTitle}</h3>
+            <p>{t.contactModalText}</p>
+            <div className="contact-modal__grid">
+              <article>
+                <h4>{t.footerEmail}</h4>
+                <p>{t.footerEmailValue}</p>
+              </article>
+              <article>
+                <h4>{t.footerAddress}</h4>
+                <p>{t.footerEmailValue}</p>
+              </article>
+              <article>
+                <h4>{t.footerExtra}</h4>
+                <p>{t.footerHours}</p>
+                <p>{t.footerSocial}</p>
+              </article>
+            </div>
+          </div>
+        </div>
       ) : null}
 
       {selectedImageIndex !== null ? (
