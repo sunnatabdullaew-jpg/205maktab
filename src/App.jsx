@@ -15,94 +15,6 @@ const certificates = [
   { id: 6, title: 'TESOL', level: 'C1', year: '2024', status: 'active' },
 ]
 
-const teachers = [
-  {
-    id: 1,
-    hudud: 'Toshkent',
-    tuman: "Mirzo Ulug'bek",
-    maktab: '205',
-    sinf: '11',
-    familiya: 'Turdiyeva',
-    ism: 'Muhayyo',
-    otasiningIsmi: 'Narzulloyevna',
-    seriya: 'AD',
-    raqam: '7375097',
-    jshshir: '43006805350013',
-    til: 'English',
-    sertifikat: 'TKT (Module 1; Module 2; Module 3)',
-    daraja: 'C1',
-    toifa: 'Oliy',
-  },
-  {
-    id: 2,
-    hudud: 'Toshkent',
-    tuman: "Mirzo Ulug'bek",
-    maktab: '205',
-    sinf: '11',
-    familiya: 'Jumabayeva',
-    ism: 'Nilufar',
-    otasiningIsmi: 'Ibroximovna',
-    seriya: 'AD',
-    raqam: '4057164',
-    jshshir: '41310830060019',
-    til: 'English',
-    sertifikat: 'TKT (Module 1; Module 2; Module 3)',
-    daraja: 'C1',
-    toifa: 'Oliy',
-  },
-  {
-    id: 3,
-    hudud: 'Toshkent',
-    tuman: "Mirzo Ulug'bek",
-    maktab: '205',
-    sinf: '11',
-    familiya: 'Raxmonova',
-    ism: 'Lola',
-    otasiningIsmi: 'Anvarovna',
-    seriya: 'AD',
-    raqam: '3655751',
-    jshshir: '41711726600027',
-    til: 'English',
-    sertifikat: 'TKT (Module 1; Module 2; Module 3)',
-    daraja: 'C1',
-    toifa: 'Oliy',
-  },
-  {
-    id: 4,
-    hudud: 'Toshkent',
-    tuman: "Mirzo Ulug'bek",
-    maktab: '205',
-    sinf: '11',
-    familiya: 'Mirzakarimova',
-    ism: 'Saodat',
-    otasiningIsmi: 'Abdunabiyevna',
-    seriya: 'AD',
-    raqam: '2022591',
-    jshshir: '42511870560041',
-    til: 'English',
-    sertifikat: 'TOEFL iTP',
-    daraja: 'C1',
-    toifa: 'II',
-  },
-  {
-    id: 5,
-    hudud: 'Toshkent',
-    tuman: "Mirzo Ulug'bek",
-    maktab: '205',
-    sinf: '11',
-    familiya: 'Mustafoyeva',
-    ism: 'Mashhura',
-    otasiningIsmi: 'Uktamovna',
-    seriya: 'AD',
-    raqam: '4027368',
-    jshshir: '42205843920092',
-    til: 'English',
-    sertifikat: 'IELTS (Academic)',
-    daraja: 'B2',
-    toifa: 'I',
-  },
-]
-
 const updates = [
   { id: 1, date: '2026-02-15', title: 'STEM haftaligi boshlandi' },
   { id: 2, date: '2026-02-12', title: 'Ingliz tili bo‘yicha ochiq darslar' },
@@ -177,7 +89,6 @@ const navIds = [
   'statistika',
   'maktab-malumot',
   'sertifikatlar',
-  'jadval',
   'yangiliklar',
   'aloqa',
 ]
@@ -213,7 +124,7 @@ const i18n = {
     heroTitle: 'Kelajak uchun sifatli taʼlim muhiti',
     heroText:
       'Oʻqituvchilarimiz xalqaro sertifikatlarga ega, dars jarayonlari ochiq, natijalar tahlil asosida yuritiladi.',
-    heroCta: 'Oʻqituvchilar jadvalini koʻrish',
+    heroCta: 'Sertifikatlarni ko‘rish',
     stats: ['faol sinf xonalari', 'oʻquvchi', 'sertifikatlangan ustoz'],
     statTitle: 'Maktab Pasporti va Natijalar',
     statText:
@@ -279,7 +190,7 @@ const i18n = {
     heroTitle: 'Quality learning environment for the future',
     heroText:
       'Our teachers hold international certifications, classes are open, and outcomes are tracked by analytics.',
-    heroCta: 'View teachers table',
+    heroCta: 'View certificates',
     stats: ['active classrooms', 'students', 'certified teachers'],
     statTitle: 'School Passport and Results',
     statText: 'General stat blocks adapted from your infographic references.',
@@ -344,7 +255,7 @@ const i18n = {
     heroTitle: 'Качественная среда обучения для будущего',
     heroText:
       'Наши учителя имеют международные сертификаты, занятия открыты, результаты анализируются.',
-    heroCta: 'Посмотреть таблицу учителей',
+    heroCta: 'Посмотреть сертификаты',
     stats: ['активных кабинетов', 'учеников', 'сертифицированных учителей'],
     statTitle: 'Паспорт школы и результаты',
     statText: 'Блоки статистики, адаптированные по вашим инфографикам.',
@@ -416,24 +327,12 @@ function App() {
   const [showTopButton, setShowTopButton] = useState(false)
   const [isCarouselPaused, setIsCarouselPaused] = useState(false)
   const [selectedImageIndex, setSelectedImageIndex] = useState(null)
-  const [tableQuery, setTableQuery] = useState('')
   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
   const [isContactModalOpen, setIsContactModalOpen] = useState(false)
   const [isHeaderToolsCollapsed, setIsHeaderToolsCollapsed] = useState(false)
 
   const t = i18n[language]
   const marqueeImages = useMemo(() => [...navImages, ...navImages], [])
-  const filteredTeachers = useMemo(() => {
-    const query = tableQuery.trim().toLowerCase()
-    if (!query) return teachers
-
-    return teachers.filter((teacher) =>
-      [teacher.familiya, teacher.ism, teacher.sertifikat]
-        .join(' ')
-        .toLowerCase()
-        .includes(query),
-    )
-  }, [tableQuery])
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme)
@@ -692,7 +591,7 @@ function App() {
             <div>
               <h2>{t.heroTitle}</h2>
               <p>{t.heroText}</p>
-              <a className="btn btn--primary" href="#jadval">
+              <a className="btn btn--primary" href="#sertifikatlar">
                 {t.heroCta}
               </a>
             </div>
@@ -826,55 +725,6 @@ function App() {
                   <p>{t.certYear}: {item.year}</p>
                 </article>
               ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="jadval" className="section reveal">
-          <div className="container">
-            <div className="section__head">
-              <h2>{t.tableTitle}</h2>
-              <p>{t.tableText}</p>
-            </div>
-            <div className="table-search">
-              <input
-                type="search"
-                value={tableQuery}
-                onChange={(event) => setTableQuery(event.target.value)}
-                placeholder={t.tableSearch}
-              />
-            </div>
-            <div className="table-wrap" role="region" aria-label={t.tableAria}>
-              <table>
-                <thead>
-                  <tr>
-                    {t.columns.map((column) => (
-                      <th key={column}>{column}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredTeachers.map((teacher) => (
-                    <tr key={teacher.id}>
-                      <td>{teacher.id}</td>
-                      <td>{teacher.hudud}</td>
-                      <td>{teacher.tuman}</td>
-                      <td>{teacher.maktab}</td>
-                      <td>{teacher.sinf}</td>
-                      <td>{teacher.familiya}</td>
-                      <td>{teacher.ism}</td>
-                      <td>{teacher.otasiningIsmi}</td>
-                      <td>{teacher.seriya}</td>
-                      <td>{teacher.raqam}</td>
-                      <td>{teacher.jshshir}</td>
-                      <td>{teacher.til}</td>
-                      <td>{teacher.sertifikat}</td>
-                      <td>{teacher.daraja}</td>
-                      <td>{teacher.toifa}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           </div>
         </section>
