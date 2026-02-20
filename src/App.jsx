@@ -157,6 +157,9 @@ const i18n = {
     footerHours: 'Dushanba - Shanba: 08:00 - 18:00',
     footerSocial:
       'Instagram: mirzo_ulugbek205 | Telegram kanal: @umumtalim205maktab | YouTube kanal: @205-IDUMMirzoUlugbektuman',
+    mapTitle: 'Maktab joylashuvi',
+    mapText: 'Xarita orqali manzilni ko‘ring.',
+    mapOpen: 'Xaritani alohida ochish',
     footerCopy: '2026 205-maktab. Barcha huquqlar himoyalangan.',
     topBtn: 'Yuqoriga',
   },
@@ -222,6 +225,9 @@ const i18n = {
     footerHours: 'Monday - Saturday: 08:00 - 18:00',
     footerSocial:
       'Instagram: mirzo_ulugbek205 | Telegram channel: @umumtalim205maktab | YouTube channel: @205-IDUMMirzoUlugbektuman',
+    mapTitle: 'School location',
+    mapText: 'View the address on the map.',
+    mapOpen: 'Open map in new tab',
     footerCopy: '2026 School 205. All rights reserved.',
     topBtn: 'Top',
   },
@@ -287,6 +293,9 @@ const i18n = {
     footerHours: 'Понедельник - Суббота: 08:00 - 18:00',
     footerSocial:
       'Instagram: mirzo_ulugbek205 | Telegram канал: @umumtalim205maktab | YouTube канал: @205-IDUMMirzoUlugbektuman',
+    mapTitle: 'Расположение школы',
+    mapText: 'Посмотрите адрес на карте.',
+    mapOpen: 'Открыть карту в новой вкладке',
     footerCopy: '2026 Школа 205. Все права защищены.',
     topBtn: 'Наверх',
   },
@@ -753,6 +762,31 @@ function App() {
           </div>
         </section>
       </main>
+
+      <section className="section map-section reveal" aria-label={t.mapTitle}>
+        <div className="container">
+          <div className="section__head">
+            <h2>{t.mapTitle}</h2>
+            <p>{t.mapText}</p>
+          </div>
+          <div className="map-wrap">
+            <iframe
+              title={t.mapTitle}
+              className="map-frame"
+              loading="lazy"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=69.363861%2C41.352736%2C69.373861%2C41.362736&layer=mapnik&marker=41.357736%2C69.368861"
+            />
+          </div>
+          <a
+            className="map-link"
+            href="https://www.openstreetmap.org/?mlat=41.357736&mlon=69.368861#map=17/41.357736/69.368861"
+            target="_blank"
+            rel="noreferrer"
+          >
+            {t.mapOpen}
+          </a>
+        </div>
+      </section>
 
       <footer id="aloqa" className="footer">
         <div className="container footer__grid">
