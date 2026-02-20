@@ -312,20 +312,28 @@ const pickRandomIndexes = (length, count) => {
   return pool.slice(0, count)
 }
 
-const getInitialTheme = () => {
-  const saved = localStorage.getItem('school-theme')
-  if (saved === 'light' || saved === 'dark') return saved
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'
-}
-
 const getInitialLanguage = () => {
   const saved = localStorage.getItem('school-language')
   if (saved === 'uz' || saved === 'en' || saved === 'ru') return saved
   return 'uz'
 }
 
+const siteUrl = 'https://205maktab.uz/'
+
+const localeByLanguage = {
+  uz: 'uz_UZ',
+  en: 'en_US',
+  ru: 'ru_RU',
+}
+
+const setMetaContent = (selector, content) => {
+  const element = document.head.querySelector(selector)
+  if (element) {
+    element.setAttribute('content', content)
+  }
+}
+
 function App() {
-  const [theme, setTheme] = useState(getInitialTheme)
   const [language, setLanguage] = useState(getInitialLanguage)
   const [isHeaderCompact, setIsHeaderCompact] = useState(false)
   const [activeNav, setActiveNav] = useState('bosh-sahifa')
@@ -344,13 +352,46 @@ function App() {
   const marqueeImages = useMemo(() => [...navImages, ...navImages], [])
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme)
-    localStorage.setItem('school-theme', theme)
-  }, [theme])
-
-  useEffect(() => {
     document.documentElement.setAttribute('lang', language)
     localStorage.setItem('school-language', language)
+
+    const languagePack = i18n[language]
+    const locale = localeByLanguage[language] ?? 'uz_UZ'
+    const pageTitle = languagePack.title
+    const pageDescription = languagePack.subtitle
+
+    document.title = pageTitle
+
+    setMetaContent('meta[name="description"]', pageDescription)
+    setMetaContent('meta[property="og:title"]', pageTitle)
+    setMetaContent('meta[property="og:description"]', pageDescription)
+    setMetaContent('meta[property="og:locale"]', locale)
+    setMetaContent('meta[property="og:url"]', siteUrl)
+    setMetaContent('meta[name="twitter:title"]', pageTitle)
+    setMetaContent('meta[name="twitter:description"]', pageDescription)
+
+    const canonical = document.head.querySelector('link[rel="canonical"]')
+    if (canonical) {
+      canonical.setAttribute('href', siteUrl)
+    }
+
+    const schoolStructuredData = document.getElementById('school-structured-data')
+    if (schoolStructuredData) {
+      schoolStructuredData.textContent = JSON.stringify({
+        '@context': 'https://schema.org',
+        '@type': 'School',
+        name: pageTitle,
+        url: siteUrl,
+        description: pageDescription,
+        email: languagePack.footerEmailValue,
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: schoolInfoRows[0]?.value ?? '',
+          addressLocality: 'Toshkent',
+          addressCountry: 'UZ',
+        },
+      })
+    }
   }, [language])
 
   useEffect(() => {
@@ -457,10 +498,6 @@ function App() {
     })
   }
 
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'light' ? 'dark' : 'light'))
-  }
-
   const openImageViewer = (index) => {
     if (!activeImageIndexes.includes(index)) return
     setSelectedImageIndex(index)
@@ -483,14 +520,6 @@ function App() {
             <a className="btn btn--primary" href="#aloqa">
               {t.contactBtn}
             </a>
-            <button
-              type="button"
-              className="btn btn--ghost"
-              onClick={toggleTheme}
-              aria-label="Theme mode toggle"
-            >
-              {theme === 'light' ? t.themeBtnDark : t.themeBtnLight}
-            </button>
             <label className="lang-switch">
               <span className="lang-switch__label">{t.langLabel}</span>
               <select
